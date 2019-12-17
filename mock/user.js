@@ -54,7 +54,7 @@ const mockRoutes = {
               'perms': 'system:person:index',
               'order_num': 1,
               'menu_id': 74,
-              'url': '/system/book/person'
+              'url': '/system/system1/person'
             }
           ],
           'parent_id': 1,
@@ -63,7 +63,7 @@ const mockRoutes = {
           'perms': null,
           'order_num': 1,
           'menu_id': 73,
-          'url': '#'
+          'url': '/system/system1/menu'
         }
       ],
       'parent_id': 0,

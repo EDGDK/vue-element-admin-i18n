@@ -30,7 +30,7 @@ export function generaMenu(routes, data) {
       // hidden: true,
       children: [],
       name: 'menu_' + item.menu_id,
-      meta: { title: item.menu_name, id: item.menu_id, roles: ['admin'] }
+      meta: { title: item.menu_name, id: item.menu_id, icon: 'documentation', roles: ['admin'] }
     }
     if (item.children) {
       generaMenu(menu.children, item.children)
@@ -87,7 +87,6 @@ const actions = {
       const loadMenuData = []
       // 先查询后台并返回左侧菜单数据并把数据添加到路由
       getAuthMenu(state.token).then(response => {
-        debugger
         let data = response
         if (response.code !== 20000) {
           Message.error({
@@ -97,6 +96,7 @@ const actions = {
           data = response.data.menuList
           Object.assign(loadMenuData, data)
           generaMenu(asyncRoutes, loadMenuData)
+          console.log(asyncRoutes)
           let accessedRoutes
           if (roles.includes('admin')) {
             // alert(JSON.stringify(asyncRoutes))
