@@ -90,27 +90,6 @@ const actions = {
     })
   },
 
-  // getAuthMenu
-  // getAuthMenu({ commit, state }) {
-  //   return new Promise((resolve, reject) => {
-  //     getAuthMenu(state.token).then(response => {
-  //       const { data } = response
-
-  //       if (!data) {
-  //         reject('Verification failed, please Login again.')
-  //       }
-  //       debugger
-  //       // const { roles, name, avatar, introduction } = data
-
-  //       // // roles must be a non-empty array
-  //       // if (!roles || roles.length <= 0) {
-  //       //   reject('getInfo: roles must be a non-null array!')
-  //       // }
-  //     }).catch(error => {
-  //       reject(error)
-  //     })
-  //   })
-  // },
   // remove token
   resetToken({ commit }) {
     return new Promise(resolve => {
