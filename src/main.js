@@ -18,6 +18,7 @@ import './icons' // icon
 import './permission' // permission control
 import './utils/error-log' // error log
 import VCharts from 'v-charts' // v-charts
+import { buttonPermission } from './directive/button-permission'
 
 import * as filters from './filters' // global filters
 
@@ -40,6 +41,9 @@ Vue.use(Element, {
   size: Cookies.get('size') || 'medium', // set element-ui default size
   i18n: (key, value) => i18n.t(key, value)
 })
+
+// 校验button按钮
+buttonPermission()
 
 // register global utility filters
 Object.keys(filters).forEach(key => {

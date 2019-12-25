@@ -3,7 +3,9 @@
     <el-button type="primary" @click="handleAddRole">
       {{ $t('permission.addRole') }}
     </el-button>
-
+    <el-button v-permit="'admin'" type="button">
+      修改
+    </el-button>
     <el-table :data="rolesList" style="width: 100%;margin-top:30px;" border>
       <el-table-column align="center" label="Role Key" width="220">
         <template slot-scope="scope">
@@ -64,7 +66,8 @@
 <script>
 import path from 'path'
 import { deepClone } from '@/utils'
-import { getRoutes, getRoles, addRole, deleteRole, updateRole } from '@/api/role'
+// import { getRoutes, getRoles, addRole, deleteRole, updateRole } from '@/api/role'
+import { getRoles, addRole, deleteRole, updateRole } from '@/api/role'
 import i18n from '@/lang'
 
 const defaultRole = {
@@ -101,10 +104,15 @@ export default {
   },
   methods: {
     async getRoutes() {
-      const res = await getRoutes()
-      this.serviceRoutes = res.data
-      const routes = this.generateRoutes(res.data)
+      // const res = await getRoutes()
+      // this.serviceRoutes = res.data
+      // const routes = this.generateRoutes(res.data)
+      // this.routes = this.i18n(routes)
+      const res = this.$store.getters.permission_routes
+      this.serviceRoutes = res
+      const routes = this.generateRoutes(res)
       this.routes = this.i18n(routes)
+      // console.log('res数据', this.routes, 'tree数据', this.routes)
     },
     async getRoles() {
       const res = await getRoles()
@@ -123,11 +131,9 @@ export default {
     // Reshape the routes structure so that it looks the same as the sidebar
     generateRoutes(routes, basePath = '/') {
       const res = []
-
       for (let route of routes) {
         // skip some route
         if (route.hidden) { continue }
-
         const onlyOneShowingChild = this.onlyOneShowingChild(route.children, route)
 
         if (route.children && onlyOneShowingChild && !route.alwaysShow) {
@@ -173,10 +179,12 @@ export default {
       this.dialogType = 'edit'
       this.dialogVisible = true
       this.checkStrictly = true
+      console.log(scope.row)
       this.role = deepClone(scope.row)
       this.$nextTick(() => {
         const routes = this.generateRoutes(this.role.routes)
         this.$refs.tree.setCheckedNodes(this.generateArr(routes))
+        // console.log('role routes ', this.role.routes, 'tree ', this.generateArr(routes))
         // set checked state of a node not affects its father and child nodes
         this.checkStrictly = false
       })
@@ -216,7 +224,6 @@ export default {
     },
     async confirmRole() {
       const isEdit = this.dialogType === 'edit'
-
       const checkedKeys = this.$refs.tree.getCheckedKeys()
       this.role.routes = this.generateTree(deepClone(this.serviceRoutes), '/', checkedKeys)
 
@@ -251,7 +258,6 @@ export default {
     onlyOneShowingChild(children = [], parent) {
       let onlyOneChild = null
       const showingChildren = children.filter(item => !item.hidden)
-
       // When there is only one child route, the child route is displayed by default
       if (showingChildren.length === 1) {
         onlyOneChild = showingChildren[0]

@@ -26,11 +26,12 @@ export function generaMenu(routes, data) {
   data.forEach(item => {
     // alert(JSON.stringify(item))
     const menu = {
-      path: item.url === '#' ? item.menu_id + '_key' : item.url,
-      component: item.url === '#' ? Layout : () => import(`@/views${item.url}/index`),
+      path: item.url,
+      component: item.isRoot ? Layout : () => import(`@/views${item.url}`),
       // hidden: true,
       children: [],
-      name: 'menu_' + item.menu_id,
+      alwaysShow: !!item.isRoot,
+      name: item.name,
       meta: { title: item.menu_name, id: item.menu_id, icon: item.icon === '#' ? 'documentation' : item.icon, roles: item.roles ? item.roles : ['admin'] }
     }
     if (item.children) {
@@ -38,10 +39,6 @@ export function generaMenu(routes, data) {
     }
     routes.push(menu)
   })
-  routes.push(
-    // 404 page must be placed at the end !!!
-    { path: '*', redirect: '/404', hidden: true }
-  )
 }
 
 /**
@@ -141,6 +138,8 @@ const actions = {
             data = response.data.menuList
             Object.assign(loadMenuData, data)
             generaMenu(asyncRoutesList, loadMenuData)
+            // 404 page must be placed at the end !!!
+            asyncRoutesList.push({ path: '*', redirect: '/404', hidden: true })
           }
         })
         commit('SET_ASYNCROUTESLIST', asyncRoutesList)

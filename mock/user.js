@@ -26,24 +26,20 @@ const users = {
 const mockRoutes = {
   menuList: [
     {
-      'create_time': '2018-03-16 11:33:00',
-      'menu_type': ' M ',
       'children': [
         {
-          'create_time': '2018-03-16 11:33:00',
-          'menu_type': 'C',
-          'children': [],
+          // 'children': [],
           'parent_id': 1,
           'menu_name': '用户管理',
           'icon': '#',
           'perms': 'system:user:index',
           'order_num': 1,
           'menu_id': 4,
+          'redirect': '/system/user',
+          'name': 'systemUser',
           'url': '/system/user'
         },
         {
-          'create_time': '2018-12-28 10:36:20',
-          'menu_type': 'M',
           'children': [
             {
               'create_time': '2018-12-28 10:50:28',
@@ -54,6 +50,8 @@ const mockRoutes = {
               'perms': 'system:person:index',
               'order_num': 1,
               'menu_id': 74,
+              'redirect': '/system/system1/person',
+              'name': 'system1Person',
               'url': '/system/system1/person'
             }
           ],
@@ -63,40 +61,46 @@ const mockRoutes = {
           'perms': null,
           'order_num': 1,
           'menu_id': 73,
-          'url': '/system/system1/menu'
+          'redirect': '/system/system1/person',
+          'name': 'system1',
+          'url': '/system/system1'
         }
       ],
+      'redirect': '/system/user',
+      'name': 'system',
       'parent_id': 0,
       'menu_name': '系统管理',
       'icon': '#',
       'perms': null,
       'order_num': 2,
+      'isRoot': true,
       'menu_id': 1,
-      'url': '#'
+      'url': '/system'
     },
     {
-      'create_time': '2018-03-16 11:33:00',
-      'menu_type': 'M',
       'children': [
         {
-          'create_time': '2018-03-16 11:33:00',
-          'menu_type': 'C',
           'parent_id': 2,
           'menu_name': '数据监控',
           'icon': '#',
           'perms': 'monitor:data:view',
+          'redirect': '/systemData/monitor',
+          'name': 'systemDataMonitor',
           'order_num': 3,
           'menu_id': 15,
-          'url': '/system/druid/monitor'
+          'url': '/systemData/monitor'
         }
       ],
+      'redirect': '/systemData/monitor',
+      'name': 'systemData',
       'parent_id': 0,
       'menu_name': '系统监控',
+      'isRoot': true,
       'icon': '#',
       'perms': null,
       'order_num': 5,
       'menu_id': 2,
-      'url': '#'
+      'url': '/systemData'
     }
   ]
 }
