@@ -25,15 +25,17 @@ function hasPermission(roles, route) {
 export function generaMenu(routes, data) {
   data.forEach(item => {
     // alert(JSON.stringify(item))
+    /* eslint-disable */
     const menu = {
       path: item.url,
       component: item.isRoot ? Layout : () => import(`@/views${item.url}`),
       // hidden: true,
       children: [],
-      alwaysShow: !!item.isRoot,
+      alwaysShow: !!item.isRoot, 
       name: item.name,
       meta: { title: item.menu_name, id: item.menu_id, icon: item.icon === '#' ? 'documentation' : item.icon, roles: item.roles ? item.roles : ['admin'] }
     }
+    /* eslint-disable */
     if (item.children) {
       generaMenu(menu.children, item.children)
     }
