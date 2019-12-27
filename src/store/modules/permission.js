@@ -1,10 +1,9 @@
 import { constantRoutes } from '@/router'
 // import { asyncRoutes, constantRoutes } from '@/router'
 import { getAuthMenu } from '@/api/user'
-import Layout from '@/layout'
 import { getToken } from '@/utils/auth'
+import { generaMenu } from '@/utils/permission'
 import { Message } from 'element-ui'
-
 /**
  * Use meta.role to determine if the current user has permission
  * @param roles
@@ -16,31 +15,6 @@ function hasPermission(roles, route) {
   } else {
     return true
   }
-}
-
-/**
- * 后台查询的菜单数据拼装成路由格式的数据
- * @param routes
- */
-export function generaMenu(routes, data) {
-  data.forEach(item => {
-    // alert(JSON.stringify(item))
-    /* eslint-disable */
-    const menu = {
-      path: item.url,
-      component: item.isRoot ? Layout : () => import(`@/views${item.url}`),
-      // hidden: true,
-      children: [],
-      alwaysShow: !!item.isRoot, 
-      name: item.name,
-      meta: { title: item.menu_name, id: item.menu_id, icon: item.icon === '#' ? 'documentation' : item.icon, roles: item.roles ? item.roles : ['admin'] }
-    }
-    /* eslint-disable */
-    if (item.children) {
-      generaMenu(menu.children, item.children)
-    }
-    routes.push(menu)
-  })
 }
 
 /**

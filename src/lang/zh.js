@@ -5,6 +5,7 @@ export default {
     guide: '引导页',
     permission: '权限测试页',
     rolePermission: '角色权限',
+    functionPermission: '功能权限',
     pagePermission: '页面权限',
     directivePermission: '指令权限',
     icons: '图标',
@@ -62,6 +63,12 @@ export default {
     clipboardDemo: 'Clipboard',
     i18n: '国际化',
     externalLink: '外链',
+    system: '系统管理',
+    systemUser: '用户管理',
+    system1: '通讯录管理',
+    system1Person: '人员通讯录',
+    systemData: '系统监控',
+    systemDataMonitor: '数据监控',
     profile: '个人中心'
   },
   navbar: {
@@ -89,6 +96,7 @@ export default {
     addRole: '新增角色',
     editPermission: '编辑权限',
     roles: '你的权限',
+    editFuncPermission: '编辑功能权限',
     switchRoles: '切换权限',
     tips: '在某些情况下，不适合使用 v-permission。例如：Element-UI 的 el-tab 或 el-table-column 以及其它动态渲染 dom 的场景。你只能通过手动设置 v-if 来实现。',
     delete: '删除',

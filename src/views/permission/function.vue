@@ -1,11 +1,5 @@
 <template>
   <div class="app-container">
-    <el-button type="primary" @click="handleAddRole">
-      {{ $t('permission.addRole') }}
-    </el-button>
-    <el-button v-permit="'admin'" type="button">
-      修改
-    </el-button>
     <el-table :data="rolesList" style="width: 100%;margin-top:30px;" border>
       <el-table-column align="center" label="Role Key" width="220">
         <template slot-scope="scope">
@@ -25,7 +19,7 @@
       <el-table-column align="center" label="Operations">
         <template slot-scope="scope">
           <el-button type="primary" size="small" @click="handleEdit(scope)">
-            {{ $t('permission.editPermission') }}
+            {{ $t('permission.editFuncPermission') }}
           </el-button>
           <el-button type="danger" size="small" @click="handleDelete(scope)">
             {{ $t('permission.delete') }}
@@ -33,8 +27,50 @@
         </template>
       </el-table-column>
     </el-table>
-
-    <el-dialog :visible.sync="dialogVisible" :title="dialogType==='edit'?'Edit Role':'New Role'">
+    <el-table
+      ref="multipleTable"
+      :data="treeTableList"
+      tooltip-effect="dark"
+      style="width: 100%;margin-top:30px;"
+      border
+      row-key="id"
+      :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
+      <el-table-column
+        align="center"
+        type="selection"
+        :select="toggleSelection"
+        width="55"
+      />
+      <el-table-column
+        label="日期"
+        align="center"
+        sortable
+        width="180"
+      >
+        <template slot-scope="scope">
+          <!-- <el-popover trigger="hover" placement="top">
+            {{ scope.row.date }}
+            <div slot="reference" class="name-wrapper">
+              <el-tag size="medium">{{ scope.row.date }}</el-tag>
+            </div>
+          </el-popover> -->
+          {{ scope.row.date }}
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="name"
+        label="姓名"
+        align="center"
+        sortable
+        width="180"
+      />
+      <el-table-column
+        prop="address"
+        align="center"
+        label="地址"
+      />
+    </el-table>
+    <el-dialog :visible.sync="dialogVisible" :title="'Edit FunctionRole'">
       <el-form :model="role" label-width="80px" label-position="left">
         <el-form-item label="Name">
           <el-input v-model="role.name" placeholder="Role Name" />
@@ -46,6 +82,9 @@
             type="textarea"
             placeholder="Role Description"
           />
+        </el-form-item>
+        <el-form-item label="上级菜单">
+          <el-input v-model="role.node" placeholder="上级菜单" @click="openMenu" />
         </el-form-item>
         <el-form-item label="Menus">
           <el-tree ref="tree" :check-strictly="checkStrictly" :data="routesData" :props="defaultProps" show-checkbox node-key="path" class="permission-tree" />
@@ -59,6 +98,9 @@
           {{ $t('permission.confirm') }}
         </el-button>
       </div>
+      <div v-show="visible" :style="{left:left+'px',top:top+'px'}" class="contextmenu">
+        <el-tree ref="selectTree" :check-strictly="selectCheckStrictly" :data="routesData" :props="selectDefaultProps" show-checkbox node-key="path" class="permission-tree" />
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -66,8 +108,7 @@
 <script>
 import path from 'path'
 import { deepClone } from '@/utils'
-import { getRoutes, getRoles, addRole, deleteRole, updateRole } from '@/api/role'
-// import { getRoles, addRole, deleteRole, updateRole } from '@/api/role'
+import { getRoutes, getRoles, deleteRole, updateRole } from '@/api/role'
 import i18n from '@/lang'
 
 const defaultRole = {
@@ -83,18 +124,67 @@ export default {
       role: Object.assign({}, defaultRole),
       routes: [],
       rolesList: [],
+      visible: false,
       dialogVisible: false,
-      dialogType: 'new',
       checkStrictly: false,
+      selectCheckStrictly: false,
+      left: 0,
+      top: 0,
       defaultProps: {
         children: 'children',
         label: 'title'
-      }
+      },
+      selectDefaultProps: {
+        children: 'children',
+        label: 'title'
+      },
+      treeTableList: [{
+        id: 1,
+        date: '2016-05-022016-05-022016-05-022016-05-022016-05-022016-05-02',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1518 弄'
+      }, {
+        id: 2,
+        date: '2016-05-04',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1517 弄'
+      }, {
+        id: 3,
+        date: '2016-05-01',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1519 弄',
+        hasChild: true,
+        children: [{
+          id: 31,
+          date: '2016-05-01',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1519 弄'
+        }, {
+          id: 32,
+          date: '2016-05-01',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1519 弄'
+        }]
+      }, {
+        id: 4,
+        date: '2016-05-03',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1516 弄'
+      }]
     }
   },
   computed: {
     routesData() {
       return this.routes
+    }
+  },
+  watch() {
+    visible(value) {
+      if (value) {
+        document.body.addEventListener('click', this.closeMenu)
+      } else {
+        document.body.removeEventListener('click', this.closeMenu)
+      }
     }
   },
   created() {
@@ -108,10 +198,6 @@ export default {
       this.serviceRoutes = res.data
       const routes = this.generateRoutes(res.data)
       this.routes = this.i18n(routes)
-      // const res = this.$store.getters.permission_routes
-      // this.serviceRoutes = res
-      // const routes = this.generateRoutes(res)
-      // this.routes = this.i18n(routes)
     },
     async getRoles() {
       const res = await getRoles()
@@ -138,7 +224,6 @@ export default {
         if (route.children && onlyOneShowingChild && !route.alwaysShow) {
           route = onlyOneShowingChild
         }
-
         const data = {
           path: path.resolve(basePath, route.path),
           title: route.meta && route.meta.title
@@ -166,16 +251,7 @@ export default {
       })
       return data
     },
-    handleAddRole() {
-      this.role = Object.assign({}, defaultRole)
-      if (this.$refs.tree) {
-        this.$refs.tree.setCheckedNodes([])
-      }
-      this.dialogType = 'new'
-      this.dialogVisible = true
-    },
     handleEdit(scope) {
-      this.dialogType = 'edit'
       this.dialogVisible = true
       this.checkStrictly = true
       this.role = deepClone(scope.row)
@@ -222,23 +298,15 @@ export default {
       return res
     },
     async confirmRole() {
-      const isEdit = this.dialogType === 'edit'
       const checkedKeys = this.$refs.tree.getCheckedKeys()
       this.role.routes = this.generateTree(deepClone(this.serviceRoutes), '/', checkedKeys)
-      if (isEdit) {
-        await updateRole(this.role.key, this.role)
-        for (let index = 0; index < this.rolesList.length; index++) {
-          if (this.rolesList[index].key === this.role.key) {
-            this.rolesList.splice(index, 1, Object.assign({}, this.role))
-            break
-          }
+      await updateRole(this.role.key, this.role)
+      for (let index = 0; index < this.rolesList.length; index++) {
+        if (this.rolesList[index].key === this.role.key) {
+          this.rolesList.splice(index, 1, Object.assign({}, this.role))
+          break
         }
-      } else {
-        const { data } = await addRole(this.role)
-        this.role.key = data.key
-        this.rolesList.push(this.role)
       }
-
       const { description, key, name } = this.role
       this.dialogVisible = false
       this.$notify({
@@ -270,12 +338,36 @@ export default {
       }
 
       return false
+    },
+    toggleSelection() {
+      debugger
+      
+    },
+    openMenu(tag, e) {
+      const menuMinWidth = 105
+      const offsetLeft = this.$el.getBoundingClientRect().left // container margin left
+      const offsetWidth = this.$el.offsetWidth // container width
+      const maxLeft = offsetWidth - menuMinWidth // left boundary
+      const left = e.clientX - offsetLeft + 15 // 15: margin right
+
+      if (left > maxLeft) {
+        this.left = maxLeft
+      } else {
+        this.left = left
+      }
+
+      this.top = e.clientY
+      this.visible = true
+      this.selectedTag = tag
+    },
+    closeMenu() {
+      this.visible = false
     }
   }
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" scope>
 .app-container {
   .roles-table {
     margin-top: 30px;
